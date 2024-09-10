@@ -1,0 +1,7 @@
+*.md
+**/dist
+.git
+.env
+.obsidian
+project_analysis
+instruction
