@@ -16,6 +16,6 @@ func main() {
 }
 
 func getQuestions(c echo.Context) error {
-	return c.String(http.StatusOK, "Sas here some questions")
+	return c.String(http.StatusOK, "hello here some questions")
 
 }

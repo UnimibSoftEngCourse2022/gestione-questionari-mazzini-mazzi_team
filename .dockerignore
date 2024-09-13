@@ -1,7 +1,7 @@
 *.md
 **/dist
-.git
+.git/
 .env
-.obsidian
-project_analysis
-instruction
+.obsidian/
+project_analysis/
+instruction/
