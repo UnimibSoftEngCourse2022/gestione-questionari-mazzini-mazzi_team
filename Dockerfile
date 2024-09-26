@@ -9,14 +9,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/main.go
+RUN go build -o ./bin/api ./cmd/api/main.go
 
 FROM alpine:latest AS prod
 
 WORKDIR /app
-COPY --from=dev /app/main .
+COPY --from=dev /app/api .
 
 RUN adduser -D -g '' appuser && chown -R appuser /app
 USER appuser
 
-CMD ["./main"]
+CMD ["./api"]
