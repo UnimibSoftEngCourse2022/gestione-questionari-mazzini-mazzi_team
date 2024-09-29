@@ -6,19 +6,28 @@ kanban-plugin: board
 
 ## TODO
 
-- [ ] diagramma Gantt @{2024-09-12}
+- [ ] questionari crud
+- [ ] GITHUB ACTION 
+	→ commit test and sonarquebe!!
+	→ push => BUILD!
+- [ ] dto e validation
+- [ ] auth
 
 
 ## IN PROGRESS
 
+- [ ] template questionari
 
 
 ## TESTING
 
+- [ ] diagramma Gantt @{2024-09-12}
 
 
 ## DONE
 
+- [ ] define all components
+- [ ] Create home templeate
 
 
 ## UML
@@ -69,6 +78,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,true,true,true,false,false,false,false,false],"tag-sort":[{"tag":"#progettazione"},{"tag":"#coding"}]}
+{"kanban-plugin":"board","list-collapse":[false,false,false,true,true,true,true,true,false],"tag-sort":[{"tag":"#progettazione"},{"tag":"#coding"}]}
 ```
 %%

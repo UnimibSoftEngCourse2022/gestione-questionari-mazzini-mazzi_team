@@ -29,24 +29,42 @@ func (a *Service) FindAll() ([]ClosedQuestion, error) {
 	return questions, nil
 }
 
-func (a *Service) Find() (*ClosedQuestion, error) {
-	question, err := a.repository.Find(1)
+// func (a *Service) Find() (*ClosedQuestion, error) {
 
-	if err != nil {
-		a.logger.Error().Msg(err.Error())
-		return nil, err
+// 	question, err := a.repository.Find()
+
+// 	if err != nil {
+// 		a.logger.Error().Msg(err.Error())
+// 		return nil, err
+// 	}
+
+// 	return question, nil
+// }
+
+func (a *Service) Create(
+	text string,
+	imageURL string,
+	category string,
+	answersText []string,
+) (*ClosedQuestion, error) {
+
+	answers := []MultipleChoice{}
+	for _, answer := range answersText {
+		answers = append(
+			answers,
+			MultipleChoice{
+				Text:       answer,
+				IsSelected: false,
+			},
+		)
 	}
 
-	return question, nil
-}
-
-func (a *Service) Create(text string, image_url string, category string) (*ClosedQuestion, error) {
 	question := &ClosedQuestion{
 		Text:       text,
-		ImageURL:   image_url,
+		ImageURL:   imageURL,
 		Category:   category,
-		AnswerType: "type_sas",
-		// Answers:
+		AnswerType: "CLOSED_QUESTION",
+		Answers:    answers,
 	}
 	question, err := a.repository.Create(question)
 

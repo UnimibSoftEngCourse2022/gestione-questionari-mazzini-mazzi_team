@@ -1,8 +1,17 @@
 package closedquestion
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+
 	"gorm.io/gorm"
 )
+
+type MultipleChoice struct {
+	Text       string `json:"text"`
+	IsSelected bool   `json:"is_selected"`
+}
 
 type ClosedQuestion struct {
 	gorm.Model
@@ -11,21 +20,19 @@ type ClosedQuestion struct {
 	ImageURL   string
 	Category   string
 	AnswerType string
-	Answers    []MultipleChoice `gorm:"type:json"`
+	Answers    MultipleChoiceArray `gorm:"type:jsonb[]" json:"answers"`
 }
 
-type MultipleChoice struct {
-	Text       string `json:"text"`
-	IsSelected bool   `json:"isSelected"`
+type MultipleChoiceArray []MultipleChoice
+
+func (a MultipleChoiceArray) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
 
-// func (q *ClosedQuestion) ToModel() *ClosedQuestion {
-
-// 	return &ClosedQuestion{
-// 		Text:       q.Text,
-// 		ImageURL:   q.ImageURL,
-// 		Category:   q.Category,
-// 		AnswerType: q.AnswerType,
-// 		Answers:    q.Answers,
-// 	}
-// }
+func (a *MultipleChoiceArray) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("failed to scan value, not []byte")
+	}
+	return json.Unmarshal(bytes, a)
+}
