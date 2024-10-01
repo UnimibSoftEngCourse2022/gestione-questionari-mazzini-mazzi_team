@@ -29,17 +29,17 @@ func (a *Service) FindAll() ([]ClosedQuestion, error) {
 	return questions, nil
 }
 
-// func (a *Service) Find() (*ClosedQuestion, error) {
+func (a *Service) FindById(id uint) (*ClosedQuestion, error) {
+	partialQuestion := ClosedQuestion{ID: id}
+	question, err := a.repository.Find(&partialQuestion)
 
-// 	question, err := a.repository.Find()
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
 
-// 	if err != nil {
-// 		a.logger.Error().Msg(err.Error())
-// 		return nil, err
-// 	}
-
-// 	return question, nil
-// }
+	return question, nil
+}
 
 func (a *Service) Create(
 	text string,
@@ -74,4 +74,44 @@ func (a *Service) Create(
 	}
 
 	return question, nil
+}
+
+func (a *Service) Update(id uint, text string, imageURL string, category string, answersText []string) (*ClosedQuestion, error) {
+	answers := []MultipleChoice{}
+	for _, answer := range answersText {
+		answers = append(
+			answers,
+			MultipleChoice{
+				Text:       answer,
+				IsSelected: false,
+			},
+		)
+	}
+
+	updatedQuestion := ClosedQuestion{
+		Text:       text,
+		ImageURL:   imageURL,
+		Category:   category,
+		AnswerType: "CLOSED_QUESTION",
+		Answers:    answers,
+	}
+	question, err := a.repository.Update(updatedQuestion)
+
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	return question, nil
+}
+
+func (a *Service) Delete(id uint) error {
+	err := a.repository.Delete(&ClosedQuestion{ID: id})
+
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return err
+	}
+
+	return nil
 }

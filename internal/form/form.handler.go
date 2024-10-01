@@ -6,6 +6,7 @@ import (
 	openquestion "form_management/internal/form/open-question"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,54 +23,130 @@ func NewFormHanlder(closedQuestionService *closedquestion.Service, openQuestionS
 	}
 }
 
+const ErrorPageHandler = "error.html"
+
 type RowData struct {
-	Question   string
-	AnswerType string
-	Category   string
-	ImageURL   string
+	QuestionID    uint
+	Question      string
+	AnswerType    string
+	Category      string
+	ImageURL      string
+	QuestionIndex int
 }
 
-func (a *API) ListQuestionsHandler(c echo.Context) error {
+type CardHTMX struct {
+	Method string
+	Target string
+	URL    string
+	Swap   string
+}
+
+func updateCard(id uint, answerType string) CardHTMX {
+	paredAnswerType := strings.ReplaceAll(strings.ToLower(answerType), "_", "-")
+	return CardHTMX{
+		Method: "put",
+		Target: "#question-row-" + strconv.FormatUint(uint64(id), 10) + "-" + paredAnswerType,
+		URL:    "/form/update/closed-question?id=" + strconv.FormatUint(uint64(id), 10),
+		Swap:   "outerHTML",
+	}
+}
+
+func createCard(answerType string) CardHTMX {
+	paredAnswerType := strings.ReplaceAll(strings.ToLower(answerType), "_", "-")
+	return CardHTMX{
+		Method: "post",
+		URL:    "/form/create/" + paredAnswerType,
+		Target: "#questions",
+		Swap:   "afterbegin",
+	}
+}
+
+func (a *API) FindQuestion(c echo.Context) error {
+	idString := c.QueryParam("id")
+	answerType := strings.ReplaceAll(strings.ToLower(c.QueryParam("answerType")), "_", "-")
+	id, err := strconv.Atoi(idString)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	if answerType == "closed-question" {
+		question, _ := a.ClosedQuestionService.FindById(uint(id))
+		data := map[string]interface{}{
+			"QuestionID":   question.ID,
+			"QuestionText": question.Text,
+			"AnswerType":   question.AnswerType,
+			"Category":     question.Category,
+			"ImageURL":     question.ImageURL,
+			"Answers":      question.Answers,
+			"htmx":         updateCard(question.ID, question.AnswerType),
+		}
+		return c.Render(http.StatusOK, "ClosedQuestionCard", data)
+
+	} else if answerType == "open-question" {
+		question, _ := a.OpenQuestionService.FindById(uint(id))
+		data := map[string]interface{}{
+			"QuestionID":   question.ID,
+			"QuestionText": question.Text,
+			"AnswerType":   question.AnswerType,
+			"Category":     question.Category,
+			"ImageURL":     question.ImageURL,
+			"MinChar":      question.MinChar,
+			"MaxChar":      question.MaxChar,
+			"htmx":         updateCard(question.ID, question.AnswerType),
+		}
+		return c.Render(http.StatusOK, "OpenQuestionCard", data)
+	}
+
+	return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": "Not Found"})
+
+}
+
+func (a *API) ListQuestions(c echo.Context) error {
 
 	closedQuestions, err := a.ClosedQuestionService.FindAll()
 	openQuestions, err := a.OpenQuestionService.FindAll()
 
 	if err != nil {
-		return c.Render(http.StatusNotFound, "error.html", map[string]interface{}{"error": err.Error()})
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
 	data := []RowData{}
 
-	for _, question := range closedQuestions {
+	for index, question := range closedQuestions {
 		data = append(
 			data,
 			RowData{
-				Question:   question.Text,
-				AnswerType: "CLOSED_QUESTION", //question.AnswerType,
-				Category:   question.Category,
-				ImageURL:   question.ImageURL,
+				QuestionID:    question.ID,
+				Question:      question.Text,
+				AnswerType:    "closed-question", //question.AnswerType,
+				Category:      question.Category,
+				ImageURL:      question.ImageURL,
+				QuestionIndex: index,
 			},
 		)
 	}
 
-	for _, question := range openQuestions {
+	len := len(data)
+	for index, question := range openQuestions {
 		data = append(
 			data,
 			RowData{
-				Question:   question.Text,
-				AnswerType: "OPEN_QUESTION", //question.AnswerType,
-				Category:   question.Category,
-				ImageURL:   question.ImageURL,
+				QuestionID:    question.ID,
+				Question:      question.Text,
+				AnswerType:    "open-question", //question.AnswerType,
+				Category:      question.Category,
+				ImageURL:      question.ImageURL,
+				QuestionIndex: index + len,
 			},
 		)
 	}
 
-	return c.Render(http.StatusOK, "Table", map[string]interface{}{"questions": data})
+	return c.Render(http.StatusOK, "TableQuestions", map[string]interface{}{"questions": data})
 }
 
-func (a *API) CreateClosedQuestionsHandler(c echo.Context) error {
+func (a *API) CreateClosedQuestions(c echo.Context) error {
 
-	common.Logger.Debug().Msg(c.FormValue("answer"))
 	questionText := c.FormValue("questionText")
 	questionImageURL := c.FormValue("questionImageURL")
 	questionCategory := c.FormValue("questionCategory")
@@ -83,10 +160,11 @@ func (a *API) CreateClosedQuestionsHandler(c echo.Context) error {
 	)
 
 	if err != nil {
-		return c.Render(http.StatusNotFound, "error.html", map[string]interface{}{"error": err.Error()})
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
 	data := RowData{
+		QuestionID: question.ID,
 		Question:   question.Text,
 		AnswerType: question.AnswerType,
 		Category:   question.Category,
@@ -95,7 +173,7 @@ func (a *API) CreateClosedQuestionsHandler(c echo.Context) error {
 	return c.Render(http.StatusOK, "Row", data)
 }
 
-func (a *API) CreateOpenQuestionsHandler(c echo.Context) error {
+func (a *API) CreateOpenQuestions(c echo.Context) error {
 
 	questionText := c.FormValue("questionText")
 	questionImageURL := c.FormValue("questionImageURL")
@@ -107,7 +185,7 @@ func (a *API) CreateOpenQuestionsHandler(c echo.Context) error {
 	minChar, err := strconv.Atoi(questionMinChar)
 
 	if err != nil {
-		return c.Render(http.StatusNotFound, "toggle", map[string]interface{}{"error": err.Error()})
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
 	question, err := a.OpenQuestionService.Create(
@@ -119,10 +197,11 @@ func (a *API) CreateOpenQuestionsHandler(c echo.Context) error {
 	)
 
 	if err != nil {
-		return c.Render(http.StatusNotFound, "error.html", map[string]interface{}{"error": err.Error()})
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
 	data := RowData{
+		QuestionID: question.ID,
 		Question:   question.Text,
 		AnswerType: question.AnswerType,
 		Category:   question.Category,
@@ -131,16 +210,119 @@ func (a *API) CreateOpenQuestionsHandler(c echo.Context) error {
 	return c.Render(http.StatusOK, "Row", data)
 }
 
-func (a *API) RenderNextStepCreationQuetion(c echo.Context) error {
-	questionType := c.QueryParam("question-type")
+func (a *API) UpdateClosedQuestions(c echo.Context) error {
 
-	switch questionType {
-	case "open-question":
-		return c.Render(http.StatusOK, "ModalOpenQuestion", nil)
-	case "closed-question":
-		return c.Render(http.StatusOK, "ModalClosedQuestion", nil)
-	default:
-		return c.Render(http.StatusNotFound, "error.html", "404 not found")
+	questionID := c.QueryParam("id")
+	questionText := c.FormValue("questionText")
+	questionImageURL := c.FormValue("questionImageURL")
+	questionCategory := c.FormValue("questionCategory")
+	questionAnswers := c.Request().Form["answer"]
+
+	id, err := strconv.Atoi(questionID)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
+	question, err := a.ClosedQuestionService.Update(
+		uint(id),
+		questionText,
+		questionImageURL,
+		questionCategory,
+		questionAnswers,
+	)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	data := RowData{
+		QuestionID: question.ID,
+		Question:   question.Text,
+		AnswerType: question.AnswerType,
+		Category:   question.Category,
+		ImageURL:   question.ImageURL,
+	}
+	return c.Render(http.StatusOK, "Row", data)
+}
+
+func (a *API) UpdateOpenQuestions(c echo.Context) error {
+
+	questionID := c.QueryParam("id")
+	questionText := c.FormValue("questionText")
+	questionImageURL := c.FormValue("questionImageURL")
+	questionCategory := c.FormValue("questionCategory")
+	questionMinChar := c.FormValue("questionMinChar")
+	questionMaxChar := c.FormValue("questionMaxChar")
+
+	maxChar, err := strconv.Atoi(questionMaxChar)
+	minChar, err := strconv.Atoi(questionMinChar)
+	id, err := strconv.Atoi(questionID)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	question, err := a.OpenQuestionService.Update(
+		uint(id),
+		questionText,
+		questionImageURL,
+		questionCategory,
+		minChar,
+		maxChar,
+	)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	data := RowData{
+		QuestionID: question.ID,
+		Question:   question.Text,
+		AnswerType: question.AnswerType,
+		Category:   question.Category,
+		ImageURL:   question.ImageURL,
+	}
+
+	common.Logger.Debug().Msg(question.Text)
+	return c.Render(http.StatusOK, "Row", data)
+
+}
+
+func (a *API) DeleteClosedQuestions(c echo.Context) error {
+	questionId := c.QueryParam("id")
+	id, err := strconv.Atoi(questionId)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	err = a.ClosedQuestionService.Delete(uint(id))
+	return c.Render(http.StatusOK, "Row", nil)
+}
+
+func (a *API) DeleteOpenQuestions(c echo.Context) error {
+	questionId := c.QueryParam("id")
+	id, err := strconv.Atoi(questionId)
+
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	err = a.OpenQuestionService.Delete(uint(id))
+	return c.Render(http.StatusOK, "Row", nil)
+}
+
+func (a *API) RenderCardClosedQuestion(c echo.Context) error {
+	data := map[string]interface{}{
+		"htmx": createCard("closed-question"),
+	}
+	return c.Render(http.StatusOK, "ClosedQuestionCard", data)
+}
+
+func (a *API) RenderCardOpenQuestion(c echo.Context) error {
+	data := map[string]interface{}{
+		"htmx": createCard("open-question"),
+	}
+	return c.Render(http.StatusOK, "OpenQuestionCard", data)
 }

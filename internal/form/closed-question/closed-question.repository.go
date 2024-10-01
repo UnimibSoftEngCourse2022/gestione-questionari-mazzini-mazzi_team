@@ -40,3 +40,20 @@ func (r *Repository) Create(question *ClosedQuestion) (*ClosedQuestion, error) {
 
 	return question, nil
 }
+
+func (r *Repository) Update(updatedQuestion ClosedQuestion) (*ClosedQuestion, error) {
+	question := &ClosedQuestion{}
+	if err := r.db.Model(question).Where("id = ?", updatedQuestion.ID).Updates(updatedQuestion).Error; err != nil {
+		return nil, err
+	}
+
+	return question, nil
+}
+
+func (r *Repository) Delete(question *ClosedQuestion) error {
+	if err := r.db.Delete(question).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

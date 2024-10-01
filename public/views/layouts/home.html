@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ . }}</title>
+    <title>{{ .Title }}</title>
 
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    <script src="/static/js/index.js"></script>
     <link
       href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
       rel="stylesheet"
@@ -17,23 +18,42 @@
       rel="stylesheet"
     />
   </head>
-  <body class="dark:bg-gray-900 antialiased">
-    <!-- Navbar -->
-    <div>{{ template "Navbar" }}</div>
-    <div
-      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-8"
-    ></div>
+  <body id="body" class="dark:bg-gray-900 antialiased">
+    <div>{{ template "NavBar" . }}</div>
+    <div class="max-w-screen-xl flex flex-wrap mx-auto p-8"></div>
 
-    <!-- Contenitore principale -->
-    <div class="mx-auto dark:bg-gray-900 antialiased">
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
       <div
-        class="w-1/2 p-6"
-        hx-get="/form/findAll"
-        hx-trigger="load"
-        hx-swap="outerHTML"
+        id="right-card"
+        class="py-4 pl-4 flex align-top col-span-2 bg-grey-500 text-white"
       >
-        {{ template "Spinner" }}
+        {{ template "DefaultCard" }}
+      </div>
+      <div id="left-card" class="py-4 pr-4 col-span-4 bg-grey-500 text-white">
+        {{ template "DefaultCard" }}
       </div>
     </div>
   </body>
 </html>
+
+{{ define "DefaultCard"}}
+<div
+  class="p-4 rounded-lg w-full h-full bg-gray-50 md:bg-white dark:bg-gray-800"
+></div>
+{{ end }} {{ define "old"}}
+
+<div>{{ template "Navbar" }}</div>
+<div class="max-w-screen-xl flex items-center justify-between p-8"></div>
+
+<!-- Body Page  -->
+<div id="body-page" class="mx-auto dark:bg-gray-900 antialiased">
+  <div
+    class="w-1/2 p-6"
+    hx-get="/form/findAll"
+    hx-trigger="load"
+    hx-swap="innerHTML"
+  >
+    {{ template "Spinner" }}
+  </div>
+</div>
+{{ end }}

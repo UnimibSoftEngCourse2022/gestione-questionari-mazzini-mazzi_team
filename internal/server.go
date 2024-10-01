@@ -21,6 +21,35 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+type PageData struct {
+	Title     string
+	UserName  string
+	UserEmail string
+	UserItems []UserItem
+	RouteItem []Route
+
+	DropdownTitle string
+	DropdownItems []Route
+}
+
+// TODO: replace with auth service
+type UserItem struct {
+	ItemText string
+	ItemURL  string
+}
+
+type Route struct {
+	RouteTitle  string
+	RouteURL    string
+	RouteTarget string
+}
+
+type DropdownItem struct {
+	ItemURL    string
+	ItemTarget string
+	ItemText   string
+}
+
 func Server() {
 	e := echo.New()
 
@@ -33,11 +62,30 @@ func Server() {
 		templates: template.Must(template.ParseGlob("public/views/**/*.html")),
 	}
 	e.Renderer = renderer
-	e.Static("/", "public")
+	e.Static("/static", "public/static")
+
+	data := PageData{
+		Title:     "Quiz App",
+		UserName:  "Mazzi",
+		UserEmail: "andre.mazzq@gamil.com",
+		UserItems: []UserItem{
+			{ItemText: "info", ItemURL: "/auth/info"},
+			{ItemText: "sign out", ItemURL: "/auth/sign-out"},
+		},
+		RouteItem: []Route{
+			{RouteTitle: "Questions", RouteTarget: "left-card", RouteURL: "/form/findAll"},
+			{RouteTitle: "Quizs", RouteTarget: "left-card", RouteURL: "/quiz/findAll"},
+		},
+		DropdownTitle: "Create Question",
+		DropdownItems: []Route{
+			{RouteTitle: "Open Question", RouteTarget: "right-card", RouteURL: "/form/open-question/create-page"},
+			{RouteTitle: "Closed Question", RouteTarget: "right-card", RouteURL: "/form/closed-question/create-page"},
+		},
+	}
 
 	e.GET("/*", func(c echo.Context) error { return c.Render(http.StatusNotFound, "error.html", "404 not found") })
-	e.GET("/", func(c echo.Context) error { return c.Render(http.StatusOK, "home.html", "Forms App") })
-	adminRoute := e.Group("/admin")
+	e.GET("/", func(c echo.Context) error { return c.Render(http.StatusOK, "home.html", data) })
+	adminRoute := e.Group("/auth")
 	formRoute := e.Group("/form")
 	admin.Route(adminRoute)
 	form.Route(formRoute)

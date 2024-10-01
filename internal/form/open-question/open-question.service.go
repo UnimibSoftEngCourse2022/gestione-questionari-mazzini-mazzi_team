@@ -29,16 +29,17 @@ func (a *Service) FindAll() ([]OpenQuestion, error) {
 	return questions, nil
 }
 
-// func (a *Service) Find() (*OpenQuestion, error) {
-// 	question, err := a.repository.Find(1)
+func (a *Service) FindById(id uint) (*OpenQuestion, error) {
+	partialQuestion := OpenQuestion{ID: id}
+	question, err := a.repository.Find(&partialQuestion)
 
-// 	if err != nil {
-// 		a.logger.Error().Msg(err.Error())
-// 		return nil, err
-// 	}
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
 
-// 	return question, nil
-// }
+	return question, nil
+}
 
 func (a *Service) Create(text string, image_url string, category string, minChar int, maxChar int) (*OpenQuestion, error) {
 
@@ -47,8 +48,8 @@ func (a *Service) Create(text string, image_url string, category string, minChar
 		ImageURL:   image_url,
 		Category:   category,
 		AnswerType: "OPEN_QUESTION",
-		MinChar:    maxChar,
-		MaxChar:    minChar,
+		MinChar:    minChar,
+		MaxChar:    maxChar,
 	}
 	question, err := a.repository.Create(question)
 
@@ -58,4 +59,34 @@ func (a *Service) Create(text string, image_url string, category string, minChar
 	}
 
 	return question, nil
+}
+
+func (a *Service) Update(id uint, text string, imageURL string, category string, minChar int, maxChar int) (*OpenQuestion, error) {
+	updatedQuestion := OpenQuestion{
+		Text:       text,
+		ImageURL:   imageURL,
+		Category:   category,
+		AnswerType: "OPEN_QUESTION",
+		MinChar:    minChar,
+		MaxChar:    maxChar,
+	}
+	question, err := a.repository.Update(updatedQuestion)
+
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	return question, nil
+}
+
+func (a *Service) Delete(id uint) error {
+	err := a.repository.Delete(&OpenQuestion{ID: id})
+
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return err
+	}
+
+	return nil
 }

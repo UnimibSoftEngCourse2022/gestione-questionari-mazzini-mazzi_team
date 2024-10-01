@@ -1,4 +1,4 @@
-package openquestion
+package quiz
 
 import (
 	"gorm.io/gorm"
@@ -14,8 +14,8 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (r *Repository) FindAll() ([]OpenQuestion, error) {
-	var questions []OpenQuestion
+func (r *Repository) FindAll() ([]Quiz, error) {
+	var questions []Quiz
 
 	if err := r.db.Find(&questions).Error; err != nil {
 		return nil, err
@@ -24,8 +24,8 @@ func (r *Repository) FindAll() ([]OpenQuestion, error) {
 	return questions, nil
 }
 
-func (r *Repository) Find(question *OpenQuestion) (*OpenQuestion, error) {
-	questions := &OpenQuestion{}
+func (r *Repository) Find(question *Quiz) (*Quiz, error) {
+	questions := &Quiz{}
 	if err := r.db.Where(question).Find(&questions).Error; err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (r *Repository) Find(question *OpenQuestion) (*OpenQuestion, error) {
 	return questions, nil
 }
 
-func (r *Repository) Create(question *OpenQuestion) (*OpenQuestion, error) {
+func (r *Repository) Create(question *Quiz) (*Quiz, error) {
 	if err := r.db.Create(question).Error; err != nil {
 		return nil, err
 	}
@@ -41,8 +41,8 @@ func (r *Repository) Create(question *OpenQuestion) (*OpenQuestion, error) {
 	return question, nil
 }
 
-func (r *Repository) Update(updatedQuestion OpenQuestion) (*OpenQuestion, error) {
-	question := &OpenQuestion{}
+func (r *Repository) Update(updatedQuestion Quiz) (*Quiz, error) {
+	question := &Quiz{}
 
 	if err := r.db.Model(question).Where("id = ?", updatedQuestion.ID).Updates(updatedQuestion).Error; err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (r *Repository) Update(updatedQuestion OpenQuestion) (*OpenQuestion, error)
 	return question, nil
 }
 
-func (r *Repository) Delete(question *OpenQuestion) error {
+func (r *Repository) Delete(question *Quiz) error {
 	if err := r.db.Delete(question).Error; err != nil {
 		return err
 	}

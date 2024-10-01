@@ -5,25 +5,34 @@ import (
 	"form_management/db"
 	closedquestion "form_management/internal/form/closed-question"
 	openquestion "form_management/internal/form/open-question"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 func Route(e *echo.Group) {
+	logger := common.Logger
+
 	db := db.Init()
 	db.AutoMigrate(&closedquestion.ClosedQuestion{})
+	db.AutoMigrate(&openquestion.OpenQuestion{})
 
-	logger := common.Logger
 	closedQuestionService := closedquestion.NewService(&logger, db)
 	openQuestionService := openquestion.NewService(&logger, db)
 	handler := NewFormHanlder(closedQuestionService, openQuestionService)
 
-	e.GET("/findAll", handler.ListQuestionsHandler)
-	e.POST("/create/open-question", handler.CreateOpenQuestionsHandler)
-	e.POST("/create/closed-question", handler.CreateClosedQuestionsHandler)
+	e.GET("/findAll", handler.ListQuestions)
+	e.GET("/find", handler.FindQuestion)
 
-	e.GET("/create/nextStep", handler.RenderNextStepCreationQuetion)
-	e.GET("/create/prevStep", func(c echo.Context) error { return c.Render(http.StatusOK, "ModalBody", nil) })
-	// e.POST("/closed-question/create", handler.CreateCloseQuestionsHandler)
+	e.POST("/create/open-question", handler.CreateOpenQuestions)
+	e.POST("/create/closed-question", handler.CreateClosedQuestions)
+
+	e.PUT("/update/closed-question", handler.UpdateClosedQuestions)
+	e.PUT("/update/open-question", handler.UpdateOpenQuestions)
+
+	e.DELETE("/delete/closed-question", handler.DeleteClosedQuestions)
+	e.DELETE("/delete/open-question", handler.DeleteOpenQuestions)
+
+	e.GET("/closed-question/create-page", handler.RenderCardClosedQuestion)
+	e.GET("/open-question/create-page", handler.RenderCardOpenQuestion)
+
 }
