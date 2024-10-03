@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o ./bin/api ./cmd/api/main.go
+RUN go build -o ./bin/api ./cmd/main.go
 
 FROM alpine:latest AS prod
 
