@@ -1,7 +1,7 @@
 package openquestion
 
 import (
-	"form_management/common"
+	common "form_management/common/logger"
 
 	"gorm.io/gorm"
 )

@@ -1,6 +1,7 @@
 package quiz
 
 import (
+	"form_management/internal/auth/user"
 	closedquestion "form_management/internal/form/closed-question"
 	openquestion "form_management/internal/form/open-question"
 
@@ -10,19 +11,25 @@ import (
 type Quiz struct {
 	gorm.Model
 	ID              uint                 `gorm:"primaryKey"`
-	ClosedQuestions []QuizClosedQuestion `gorm:"many2many:quiz_closed_questions;"`
-	OpenQuestions   []QuizOpenQuestion   `gorm:"many2many:quiz_open_questions;"`
-	Title           string
+	ClosedQuestions []QuizClosedQuestion `gorm:"foreignKey:QuizID"`
+	OpenQuestions   []QuizOpenQuestion   `gorm:"foreignKey:QuizID"`
+	Title           string               `gorm:"not null"`
+	UserID          uint                 //`gorm:"not null"`
+	User            user.User            `gorm:"foreignKey:UserID;references:ID"`
 }
 
 type QuizClosedQuestion struct {
-	QuizID           Quiz                          `gorm:"primaryKey"`
-	ClosedQuestionID closedquestion.ClosedQuestion `gorm:"primaryKey"`
-	Order            int
+	ClosedQuestionID uint                          `gorm:"primaryKey"`
+	QuizID           uint                          `gorm:"primaryKey"`
+	ClosedQuestion   closedquestion.ClosedQuestion `gorm:"foreignKey:ClosedQuestionID;references:ID"`
+	Quiz             Quiz                          `gorm:"foreignKey:QuizID;references:ID"`
+	Order            int                           `gorm:"not null"`
 }
 
 type QuizOpenQuestion struct {
-	QuizID         Quiz                      `gorm:"primaryKey"`
-	OpenQuestionID openquestion.OpenQuestion `gorm:"primaryKey"`
-	Order          int
+	OpenQuestionID uint                      `gorm:"primaryKey"`
+	QuizID         uint                      `gorm:"primaryKey"`
+	OpenQuestion   openquestion.OpenQuestion `gorm:"foreignKey:OpenQuestionID;references:ID"`
+	Quiz           Quiz                      `gorm:"foreignKey:QuizID;references:ID"`
+	Order          int                       `gorm:"not null"`
 }

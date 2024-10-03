@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: "default:18" e "not null"
+// TODO: remove this and replace eith string[]
 type MultipleChoice struct {
 	Text       string `json:"text"`
 	IsSelected bool   `json:"is_selected"`

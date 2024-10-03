@@ -1,7 +1,7 @@
 package main
 
 import (
-	"form_management/common"
+	common "form_management/common/logger"
 	"form_management/internal"
 
 	"github.com/joho/godotenv"

@@ -1,7 +1,7 @@
 package form
 
 import (
-	"form_management/common"
+	common "form_management/common/logger"
 	"form_management/db"
 	closedquestion "form_management/internal/form/closed-question"
 	openquestion "form_management/internal/form/open-question"

@@ -1,7 +1,7 @@
 package quiz
 
 import (
-	"form_management/common"
+	common "form_management/common/logger"
 
 	"gorm.io/gorm"
 )
@@ -41,25 +41,20 @@ func (a *Service) FindById(id uint) (*Quiz, error) {
 	return quiz, nil
 }
 
-// func (a *Service) Create() (*Quiz, error) {
+func (a *Service) Create(title string) (*Quiz, error) {
 
-// 	quiz := &Quiz{
-// 		Text:       text,
-// 		ImageURL:   image_url,
-// 		Category:   category,
-// 		AnswerType: "OPEN_QUESTION",
-// 		MinChar:    minChar,
-// 		MaxChar:    maxChar,
-// 	}
-// 	quiz, err := a.repository.Create(quiz)
+	quiz := &Quiz{
+		Title: title,
+	}
+	quiz, err := a.repository.Create(quiz)
 
-// 	if err != nil {
-// 		a.logger.Error().Msg(err.Error())
-// 		return nil, err
-// 	}
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
 
-// 	return quiz, nil
-// }
+	return quiz, nil
+}
 
 // func (a *Service) Update(id uint, text string, imageURL string, category string, minChar int, maxChar int) (*Quiz, error) {
 // 	updatedQuestion := Quiz{

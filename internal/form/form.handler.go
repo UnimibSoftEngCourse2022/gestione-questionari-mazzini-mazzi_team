@@ -1,7 +1,6 @@
 package form
 
 import (
-	"form_management/common"
 	closedquestion "form_management/internal/form/closed-question"
 	openquestion "form_management/internal/form/open-question"
 	"net/http"
@@ -170,7 +169,7 @@ func (a *API) CreateClosedQuestions(c echo.Context) error {
 		Category:   question.Category,
 		ImageURL:   question.ImageURL,
 	}
-	return c.Render(http.StatusOK, "Row", data)
+	return c.Render(http.StatusOK, "QuestionRow", data)
 }
 
 func (a *API) CreateOpenQuestions(c echo.Context) error {
@@ -207,7 +206,7 @@ func (a *API) CreateOpenQuestions(c echo.Context) error {
 		Category:   question.Category,
 		ImageURL:   question.ImageURL,
 	}
-	return c.Render(http.StatusOK, "Row", data)
+	return c.Render(http.StatusOK, "QuestionRow", data)
 }
 
 func (a *API) UpdateClosedQuestions(c echo.Context) error {
@@ -243,7 +242,7 @@ func (a *API) UpdateClosedQuestions(c echo.Context) error {
 		Category:   question.Category,
 		ImageURL:   question.ImageURL,
 	}
-	return c.Render(http.StatusOK, "Row", data)
+	return c.Render(http.StatusOK, "QuestionRow", data)
 }
 
 func (a *API) UpdateOpenQuestions(c echo.Context) error {
@@ -284,8 +283,7 @@ func (a *API) UpdateOpenQuestions(c echo.Context) error {
 		ImageURL:   question.ImageURL,
 	}
 
-	common.Logger.Debug().Msg(question.Text)
-	return c.Render(http.StatusOK, "Row", data)
+	return c.Render(http.StatusOK, "QuestionRow", data)
 
 }
 
@@ -298,7 +296,7 @@ func (a *API) DeleteClosedQuestions(c echo.Context) error {
 	}
 
 	err = a.ClosedQuestionService.Delete(uint(id))
-	return c.Render(http.StatusOK, "Row", nil)
+	return c.Render(http.StatusOK, "QuestionRow", nil)
 }
 
 func (a *API) DeleteOpenQuestions(c echo.Context) error {
@@ -310,7 +308,7 @@ func (a *API) DeleteOpenQuestions(c echo.Context) error {
 	}
 
 	err = a.OpenQuestionService.Delete(uint(id))
-	return c.Render(http.StatusOK, "Row", nil)
+	return c.Render(http.StatusOK, "QuestionRow", nil)
 }
 
 func (a *API) RenderCardClosedQuestion(c echo.Context) error {
