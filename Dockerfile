@@ -14,7 +14,7 @@ RUN go build -o ./bin/api ./cmd/main.go
 FROM alpine:latest AS prod
 
 WORKDIR /app
-COPY --from=dev /app/api .
+COPY --from=dev /app/bin/api .
 
 RUN adduser -D -g '' appuser && chown -R appuser /app
 USER appuser
