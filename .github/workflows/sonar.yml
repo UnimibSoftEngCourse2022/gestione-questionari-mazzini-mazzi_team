@@ -1,13 +1,10 @@
-name: Build
+name: sonar
 
-on:
-  push:
-    branches:
-      - dev
+on: workflow_dispatch
 
 jobs:
-  build:
-    name: Build and analyze
+  sonar:
+    name: analyze with sonar
     runs-on: ubuntu-latest
 
     steps:
