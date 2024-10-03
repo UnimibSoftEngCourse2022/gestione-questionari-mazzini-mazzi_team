@@ -21,8 +21,11 @@ func AuthMiddleware(handler echo.HandlerFunc) echo.HandlerFunc {
 			return c.Redirect(http.StatusTemporaryRedirect, "/login")
 		}
 
-		code := sess.Values["code"]
-		_, err = userService.IsLogged(code.(string))
+		id := sess.Values["id"]
+		if id == nil {
+			return c.Redirect(http.StatusTemporaryRedirect, "/login")
+		}
+		_, err = userService.IsLogged(id.(uint))
 		if err != nil {
 			return c.Redirect(http.StatusTemporaryRedirect, "/login")
 		}

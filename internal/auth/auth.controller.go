@@ -23,4 +23,5 @@ func Route(e *echo.Group) {
 	e.POST("/register/guest", nil)
 	e.POST("/register/user", handler.RegisterUser)
 
+	e.GET("/logout", handler.Logout)
 }

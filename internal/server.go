@@ -69,7 +69,7 @@ var data = PageData{
 	UserEmail: "andre.mazzq@gamil.com",
 	UserItems: []UserItem{
 		{ItemText: "info", ItemURL: "/auth/info"},
-		{ItemText: "sign out", ItemURL: "/auth/sign-out"},
+		{ItemText: "logout", ItemURL: "/auth/logout"},
 	},
 	RouteItem: []Route{
 		{RouteTitle: "Questions", RouteTarget: "left-card", RouteURL: "/form/findAll"},
@@ -103,7 +103,7 @@ func Server() {
 	common.NewLogger()
 	e.Use(common.LoggingMiddleware)
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))))
-	e.Use(middleware.Recover())
+	// e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
 	renderer := &TemplateRenderer{

@@ -53,8 +53,8 @@ func checkPasswordHash(password string, hash string) bool {
 	return err == nil
 }
 
-func (a *Service) IsLogged(code string) (*UserInfo, error) {
-	partialUser := User{Code: code}
+func (a *Service) IsLogged(id uint) (*UserInfo, error) {
+	partialUser := User{ID: id}
 	user, err := a.repository.Find(&partialUser)
 
 	if err != nil {
