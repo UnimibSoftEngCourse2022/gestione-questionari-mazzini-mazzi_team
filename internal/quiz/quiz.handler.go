@@ -2,6 +2,7 @@ package quiz
 
 import (
 	"errors"
+	service "form_management/internal/quiz/services"
 	"net/http"
 	"strconv"
 
@@ -10,10 +11,10 @@ import (
 )
 
 type API struct {
-	QuizService *Service
+	QuizService *service.QuizService
 }
 
-func NewQuizHanlder(service *Service) *API {
+func NewQuizHanlder(service *service.QuizService) *API {
 	return &API{
 		QuizService: service,
 	}

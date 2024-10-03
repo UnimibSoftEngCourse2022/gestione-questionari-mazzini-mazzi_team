@@ -3,6 +3,8 @@ package quiz
 import (
 	common "form_management/common/logger"
 	"form_management/db"
+	"form_management/internal/quiz/entities"
+	service "form_management/internal/quiz/services"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,9 +13,13 @@ func Route(e *echo.Group) {
 	logger := common.Logger
 
 	db := db.Init()
-	db.AutoMigrate(&Quiz{}, &QuizClosedQuestion{}, &QuizOpenQuestion{})
+	db.AutoMigrate(
+		&entities.Quiz{},
+		&entities.QuizClosedQuestion{},
+		&entities.QuizOpenQuestion{},
+	)
 
-	service := NewService(&logger, db)
+	service := service.NewQuizService(&logger, db)
 	handler := NewQuizHanlder(service)
 
 	e.GET("/findAll", handler.ListQuiz)

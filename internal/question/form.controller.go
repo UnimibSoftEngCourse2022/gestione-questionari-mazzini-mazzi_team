@@ -1,10 +1,10 @@
-package form
+package question
 
 import (
 	common "form_management/common/logger"
 	"form_management/db"
-	closedquestion "form_management/internal/form/closed-question"
-	openquestion "form_management/internal/form/open-question"
+	closedquestion "form_management/internal/question/closed-question"
+	openquestion "form_management/internal/question/open-question"
 
 	"github.com/labstack/echo/v4"
 )

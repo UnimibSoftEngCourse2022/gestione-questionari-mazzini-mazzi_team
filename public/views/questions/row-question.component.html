@@ -47,7 +47,19 @@
     >
       Delete
     </button>
-
+    <button
+      {{ if eq .AnswerType "open-question" }}
+      hx-put="/quiz/update/add-open-question?id={{ .QuestionID }}"
+      {{ else }}
+      hx-put="/quiz/update/add-closed-question?id={{ .QuestionID }}"
+      {{ end }}
+      hx-trigger="click"
+      hx-target=""
+      hx-swap=""
+      class="p-1 font-medium text-red-600 dark:text-red-500 "
+    >
+      add
+    </button>
   </td>
 </tr>
 

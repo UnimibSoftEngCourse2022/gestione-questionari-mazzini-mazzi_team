@@ -3,7 +3,7 @@ package internal
 import (
 	common "form_management/common/logger"
 	"form_management/internal/auth"
-	"form_management/internal/form"
+	"form_management/internal/question"
 	"form_management/internal/quiz"
 	"html/template"
 	"io"
@@ -124,7 +124,7 @@ func Server() {
 	formRoute := e.Group("/form", auth.AuthMiddleware)
 	quizRoute := e.Group("/quiz", auth.AuthMiddleware)
 	auth.Route(authRoute)
-	form.Route(formRoute)
+	question.Route(formRoute)
 	quiz.Route(quizRoute)
 
 	common.Logger.LogInfo().Msg(e.Start(":" + os.Getenv("APP_PORT")).Error())
