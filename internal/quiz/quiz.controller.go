@@ -18,9 +18,8 @@ func Route(e *echo.Group) {
 
 	e.GET("/findAll", handler.ListQuiz)
 	e.GET("/find", handler.FindQuiz)
-
 	e.POST("/create", handler.CreateQuiz)
-
+	e.POST("/update", handler.UpdateQuiz)
 	e.DELETE("/delete", handler.DeleteQuiz)
 
 }

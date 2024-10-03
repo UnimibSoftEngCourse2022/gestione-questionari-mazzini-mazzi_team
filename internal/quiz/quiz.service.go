@@ -18,8 +18,8 @@ func NewService(logger *common.MyLogger, db *gorm.DB) *Service {
 	}
 }
 
-func (a *Service) FindAll() ([]Quiz, error) {
-	quizs, err := a.repository.FindAll()
+func (a *Service) FindAll(userID uint) ([]Quiz, error) {
+	quizs, err := a.repository.FindAll(userID)
 
 	if err != nil {
 		a.logger.Error().Msg(err.Error())
@@ -29,8 +29,8 @@ func (a *Service) FindAll() ([]Quiz, error) {
 	return quizs, nil
 }
 
-func (a *Service) FindById(id uint) (*Quiz, error) {
-	partialQuiz := Quiz{ID: id}
+func (a *Service) FindById(id uint, userID uint) (*Quiz, error) {
+	partialQuiz := Quiz{ID: id, UserID: userID}
 	quiz, err := a.repository.Find(&partialQuiz)
 
 	if err != nil {
@@ -41,10 +41,11 @@ func (a *Service) FindById(id uint) (*Quiz, error) {
 	return quiz, nil
 }
 
-func (a *Service) Create(title string) (*Quiz, error) {
+func (a *Service) Create(title string, userID uint) (*Quiz, error) {
 
 	quiz := &Quiz{
-		Title: title,
+		Title:  title,
+		UserID: userID,
 	}
 	quiz, err := a.repository.Create(quiz)
 
@@ -56,32 +57,21 @@ func (a *Service) Create(title string) (*Quiz, error) {
 	return quiz, nil
 }
 
-// func (a *Service) Update(id uint, text string, imageURL string, category string, minChar int, maxChar int) (*Quiz, error) {
-// 	updatedQuestion := Quiz{
-// 		Text:       text,
-// 		ImageURL:   imageURL,
-// 		Category:   category,
-// 		AnswerType: "OPEN_QUESTION",
-// 		MinChar:    minChar,
-// 		MaxChar:    maxChar,
-// 	}
-// 	quiz, err := a.repository.Update(updatedQuestion)
-
-// 	if err != nil {
-// 		a.logger.Error().Msg(err.Error())
-// 		return nil, err
-// 	}
-
-// 	return quiz, nil
-// }
-
-func (a *Service) Delete(id uint) error {
-	err := a.repository.Delete(&Quiz{ID: id})
-
+func (a *Service) Delete(id uint, UserID uint) error {
+	err := a.repository.Delete(&Quiz{ID: id, UserID: UserID})
 	if err != nil {
 		a.logger.Error().Msg(err.Error())
 		return err
 	}
 
+	return nil
+}
+
+func (a *Service) UpdateClosedQuestion() error {
+
+	return nil
+}
+
+func (a *Service) UpdateOpenQuestion() error {
 	return nil
 }

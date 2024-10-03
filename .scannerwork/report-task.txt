@@ -2,5 +2,5 @@ projectKey=form_app
 serverUrl=http://localhost:9090
 serverVersion=10.6.0.92116
 dashboardUrl=http://localhost:9090/dashboard?id=form_app
-ceTaskId=be628b43-4efb-4905-b3d5-3f22b45cc1cc
-ceTaskUrl=http://localhost:9090/api/ce/task?id=be628b43-4efb-4905-b3d5-3f22b45cc1cc
+ceTaskId=cac13b43-38f7-4e47-9eee-2d252752e4d1
+ceTaskUrl=http://localhost:9090/api/ce/task?id=cac13b43-38f7-4e47-9eee-2d252752e4d1

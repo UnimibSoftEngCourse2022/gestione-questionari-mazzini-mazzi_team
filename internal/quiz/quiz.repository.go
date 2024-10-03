@@ -14,10 +14,10 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (r *Repository) FindAll() ([]Quiz, error) {
+func (r *Repository) FindAll(userID uint) ([]Quiz, error) {
 	var questions []Quiz
 
-	if err := r.db.Find(&questions).Error; err != nil {
+	if err := r.db.Where("user_id = ? ", userID).Find(&questions).Error; err != nil {
 		return nil, err
 	}
 

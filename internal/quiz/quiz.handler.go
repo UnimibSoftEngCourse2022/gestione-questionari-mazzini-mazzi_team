@@ -1,9 +1,11 @@
 package quiz
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,9 +27,28 @@ type RowData struct {
 	Length    int
 }
 
-func (a *API) ListQuiz(c echo.Context) error {
-	quizs, err := a.QuizService.FindAll()
+func extractUserAuth(c echo.Context) (*uint, error) {
+	sess, err := session.Get("quiz_app_session", c)
+	if err != nil {
+		return nil, err
+	}
 
+	id := sess.Values["id"]
+	if id == nil {
+		return nil, errors.New("user data not in session")
+	}
+
+	parsedId := id.(uint)
+	return &parsedId, nil
+}
+
+func (a *API) ListQuiz(c echo.Context) error {
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	quizs, err := a.QuizService.FindAll(*userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -54,7 +75,12 @@ func (a *API) FindQuiz(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	quiz, err := a.QuizService.FindById(uint(id))
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	quiz, err := a.QuizService.FindById(uint(id), *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -68,8 +94,12 @@ func (a *API) FindQuiz(c echo.Context) error {
 
 func (a *API) CreateQuiz(c echo.Context) error {
 	title := c.FormValue("QuizName")
-	quiz, err := a.QuizService.Create(title)
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
 
+	quiz, err := a.QuizService.Create(title, *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -91,12 +121,16 @@ func (a *API) UpdateQuiz(c echo.Context) error {
 func (a *API) DeleteQuiz(c echo.Context) error {
 	stringId := c.QueryParam("id")
 	id, err := strconv.Atoi(stringId)
-
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	err = a.QuizService.Delete(uint(id))
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	err = a.QuizService.Delete(uint(id), *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
