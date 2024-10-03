@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	common "form_management/common/logger"
@@ -9,14 +9,18 @@ import (
 )
 
 type QuizService struct {
-	logger     *common.MyLogger
-	repository *repositories.QuizRepository
+	logger                    *common.MyLogger
+	repository                *repositories.QuizRepository
+	quizOpenQuestionService   *QuizOpenQuestionService
+	quizClosedQuestionService *QuizClosedQuestionService
 }
 
 func NewQuizService(logger *common.MyLogger, db *gorm.DB) *QuizService {
 	return &QuizService{
-		logger:     logger,
-		repository: repositories.NewQuizRepository(db),
+		logger:                    logger,
+		repository:                repositories.NewQuizRepository(db),
+		quizOpenQuestionService:   NewQuizOpenQuestionService(logger, db),
+		quizClosedQuestionService: NewQuizClosedQuestionService(logger, db),
 	}
 }
 
@@ -67,4 +71,68 @@ func (a *QuizService) Delete(id uint, UserID uint) error {
 	}
 
 	return nil
+}
+
+func (a *QuizService) AddOpenQuestion(openQuestionID uint, quizID uint, userID uint) (*entities.Quiz, error) {
+	quiz, err := a.FindById(quizID, userID)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	order := 0
+	if len(quiz.OpenQuestions) > order {
+		order = len(quiz.OpenQuestions) + 1
+	}
+
+	if len(quiz.ClosedQuestions) > order {
+		order = len(quiz.ClosedQuestions) + 1
+	}
+
+	quizOpenQuestion, err := a.quizOpenQuestionService.Create(openQuestionID, quizID, order)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	quiz.OpenQuestions = append(quiz.OpenQuestions, *quizOpenQuestion)
+	updatedQuiz, err := a.repository.Update(*quiz)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	return updatedQuiz, nil
+}
+
+func (a *QuizService) AddClosedQuestion(closedQuestionID uint, quizID uint, userID uint) (*entities.Quiz, error) {
+	quiz, err := a.FindById(quizID, userID)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	order := 0
+	if len(quiz.OpenQuestions) > order {
+		order = len(quiz.OpenQuestions) + 1
+	}
+
+	if len(quiz.ClosedQuestions) > order {
+		order = len(quiz.ClosedQuestions) + 1
+	}
+
+	quizOpenQuestion, err := a.quizOpenQuestionService.Create(closedQuestionID, quizID, order)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	quiz.OpenQuestions = append(quiz.OpenQuestions, *quizOpenQuestion)
+	updatedQuiz, err := a.repository.Update(*quiz)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	return updatedQuiz, nil
 }

@@ -115,10 +115,6 @@ func (a *API) CreateQuiz(c echo.Context) error {
 
 }
 
-func (a *API) UpdateQuiz(c echo.Context) error {
-	return nil
-}
-
 func (a *API) DeleteQuiz(c echo.Context) error {
 	stringId := c.QueryParam("id")
 	id, err := strconv.Atoi(stringId)
@@ -137,4 +133,56 @@ func (a *API) DeleteQuiz(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "QuizRow", nil)
+}
+
+func (a *API) AddOpenQuestionQuiz(c echo.Context) error {
+	stringQuizId := c.QueryParam("quizID")
+	stringQuestioId := c.QueryParam("questionID")
+
+	quizID, err := strconv.Atoi(stringQuizId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	questionID, err := strconv.Atoi(stringQuestioId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	updatedQuiz, err := a.QuizService.AddOpenQuestion(uint(questionID), uint(quizID), uint(*userID))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	return c.Render(http.StatusOK, "CardQuiz", updatedQuiz)
+}
+
+func (a *API) AddClosedQuestionQuiz(c echo.Context) error {
+	stringQuizId := c.QueryParam("quizID")
+	stringQuestioId := c.QueryParam("questionID")
+
+	quizID, err := strconv.Atoi(stringQuizId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	questionID, err := strconv.Atoi(stringQuestioId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	userID, err := extractUserAuth(c)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	updatedQuiz, err := a.QuizService.AddClosedQuestion(uint(questionID), uint(quizID), uint(*userID))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	return c.Render(http.StatusOK, "CardQuiz", updatedQuiz)
 }
