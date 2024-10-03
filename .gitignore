@@ -6,3 +6,6 @@ tmp/*
 tmp/**
 .env
 .secrets
+.scannerwork/**
+.scannerwork/*
+.scannerwork/
