@@ -24,6 +24,7 @@
   <td class="px-6 py-4">{{ .AnswerType }}</td>
   <td class="px-6 py-4">{{ .Category }}</td>
   <td class="px-6 py-4 flex item-center">
+    {{ if eq .QuizID "" }}
     <button
       id="trigger-modal-{{ .QuestionID }}-{{ .AnswerType }}"
       hx-get="/form/find?id={{ .QuestionID }}&answerType={{ .AnswerType }}"
@@ -47,19 +48,21 @@
     >
       Delete
     </button>
+    {{ else }}
     <button
       {{ if eq .AnswerType "open-question" }}
-      hx-put="/quiz/update/add-open-question?questionID={{ .QuestionID }}&quizID=3"
+      hx-put="/quiz/update/add-open-question?questionID={{ .QuestionID }}&quizID={{ .QuizID }}"
       {{ else }}
-      hx-put="/quiz/update/add-closed-question?questionID={{ .QuestionID }}&quizID=3"
+      hx-put="/quiz/update/add-closed-question?questionID={{ .QuestionID }}&quizID={{ .QuizID }}"
       {{ end }}
       hx-trigger="click"
       hx-target="#quiz-question-section"
       hx-swap="afterbegin"
-      class="p-1 font-medium text-green-600 dark:text-green-500 "
+      class="p-1 font-medium text-green-600 dark:text-green-500"
     >
       add
     </button>
+    {{ end }}
   </td>
 </tr>
 

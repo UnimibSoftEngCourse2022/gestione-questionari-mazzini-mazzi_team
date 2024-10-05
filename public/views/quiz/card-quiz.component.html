@@ -1,12 +1,14 @@
 {{ define "CardQuiz" }}
-<div id="card-quiz">
+<div id="card-quiz" class="w-full h-screen overflow-y-auto">
   <div
     href="#"
     class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 w-full"
   >
-    <h3 class="font-normal text-gray-700 dark:text-gray-400">
+    <h5
+      class="text-xl font-bold leading-none text-gray-900 dark:text-white mb-2"
+    >
       {{ .QuizTitle }}
-    </h3>
+    </h5>
 
     <div id="quiz-question-section">
       {{ range $index, $question := .OpenQuestions }}

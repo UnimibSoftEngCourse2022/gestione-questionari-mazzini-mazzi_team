@@ -38,7 +38,7 @@ func NewQuizHandler(
 	}
 }
 
-const ErrorPageHandler = "error.html"
+const ErrorPageHandler = "ToastError"
 
 type RowData struct {
 	QuizID    uint

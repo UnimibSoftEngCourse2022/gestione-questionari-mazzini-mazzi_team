@@ -25,6 +25,8 @@ type PageData struct {
 	DropdownInputTitle      string
 	DropdownInputItemTarget string
 	DropdownInputItemURL    string
+
+	QuizId string
 }
 
 // TODO: replace with auth service
@@ -79,7 +81,7 @@ func HomePageHandler(c echo.Context) error {
 }
 
 func QuestionPageHandler(c echo.Context) error {
-	var data = PageData{
+	var data interface{} = PageData{
 		Title:     "Quiz App",
 		UserName:  "Utente",
 		UserEmail: "",
@@ -100,7 +102,7 @@ func QuestionPageHandler(c echo.Context) error {
 }
 
 func QuizPageHandler(c echo.Context) error {
-	var data = PageData{
+	var data interface{} = PageData{
 		Title:     "Quiz App",
 		UserName:  "Utente",
 		UserEmail: "",
@@ -120,5 +122,21 @@ func QuizPageHandler(c echo.Context) error {
 }
 
 func QuizEditPageHandler(c echo.Context) error {
-	return nil
+
+	quizID := c.QueryParam("quizID")
+	var data interface{} = PageData{
+		Title:     "Quiz App",
+		UserName:  "Utente",
+		UserEmail: "",
+		UserItems: []UserItem{
+			{ItemText: "logout", ItemURL: "/auth/logout"},
+		},
+		RouteItem: []Route{
+			{RouteTitle: "Questions", RouteTarget: "body", RouteURL: "/questions"},
+			{RouteTitle: "Quizs", RouteTarget: "body", RouteURL: "/quizs"},
+		},
+		QuizId: quizID,
+	}
+
+	return c.Render(http.StatusOK, "quiz-edit.page.html", data)
 }

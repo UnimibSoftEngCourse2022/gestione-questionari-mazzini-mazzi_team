@@ -22,7 +22,7 @@ func NewQuestionHanlder(closedQuestionService *closedquestion.Service, openQuest
 	}
 }
 
-const ErrorPageHandler = "error.html"
+const ErrorPageHandler = "ToastError"
 
 type RowData struct {
 	QuestionID    uint
@@ -31,6 +31,7 @@ type RowData struct {
 	Category      string
 	ImageURL      string
 	QuestionIndex int
+	QuizID        string
 }
 
 type CardHTMX struct {
@@ -103,6 +104,7 @@ func (a *API) FindQuestion(c echo.Context) error {
 
 func (a *API) ListQuestions(c echo.Context) error {
 
+	quizID := c.QueryParam("quizID")
 	closedQuestions, err := a.ClosedQuestionService.FindAll()
 	openQuestions, err := a.OpenQuestionService.FindAll()
 
@@ -122,6 +124,7 @@ func (a *API) ListQuestions(c echo.Context) error {
 				Category:      question.Category,
 				ImageURL:      question.ImageURL,
 				QuestionIndex: index,
+				QuizID:        quizID,
 			},
 		)
 	}
@@ -137,6 +140,7 @@ func (a *API) ListQuestions(c echo.Context) error {
 				Category:      question.Category,
 				ImageURL:      question.ImageURL,
 				QuestionIndex: index + len,
+				QuizID:        quizID,
 			},
 		)
 	}

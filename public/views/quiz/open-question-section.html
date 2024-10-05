@@ -1,15 +1,21 @@
 {{ define "OpenQuestionSection"}}
-<div>
-  <h3 class="font-normal text-gray-700 dark:text-gray-400">{{ .Text }}</h3>
+<div
+  class="my-4 block w-full bg-white dark:bg-gray-800 flex flex-col border-t dark:bg-gray-700 pt-4"
+>
+  <div class="py-2">
+    <h3 class="font-normal text-gray-700 dark:text-gray-400 mb-2">
+      {{ .Text }}
+    </h3>
 
-  <div class="col-span-2 mb-4">
-    <textarea
-      id="questionText"
-      name="questionText"
-      rows="2"
-      class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      placeholder="Write the text of the questions"
-    ></textarea>
+    <div class="col-span-2 mb-4">
+      <textarea
+        id="questionText"
+        name="questionText"
+        rows="2"
+        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Write the text of the questions"
+      ></textarea>
+    </div>
   </div>
 </div>
 {{ end }}

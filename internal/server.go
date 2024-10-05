@@ -105,6 +105,7 @@ func Server() {
 	e.GET("/", HomePageHandler, auth.AuthMiddleware)
 	e.GET("/questions", QuestionPageHandler, auth.AuthMiddleware)
 	e.GET("/quizs", QuizPageHandler, auth.AuthMiddleware)
+	e.GET("/quiz-edit", QuizEditPageHandler, auth.AuthMiddleware)
 
 	authRoute := e.Group("/auth")
 	formRoute := e.Group("/form", auth.AuthMiddleware)
