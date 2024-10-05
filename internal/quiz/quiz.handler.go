@@ -1,22 +1,40 @@
 package quiz
 
 import (
-	"errors"
+	session "form_management/common/session"
+	closedquestion "form_management/internal/question/closed-question"
+	openquestion "form_management/internal/question/open-question"
 	service "form_management/internal/quiz/services"
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
 type API struct {
-	QuizService *service.QuizService
+	quizService               *service.QuizService
+	sessionService            *session.SessionService
+	quizOpenQuestionService   *service.QuizOpenQuestionService
+	quizClosedQuestionService *service.QuizClosedQuestionService
+	openQuestionService       *openquestion.Service
+	closedQuestionService     *closedquestion.Service
 }
 
-func NewQuizHanlder(service *service.QuizService) *API {
+func NewQuizHandler(
+	quizService *service.QuizService,
+	sessionService *session.SessionService,
+	quizOpenQuestionService *service.QuizOpenQuestionService,
+	quizClosedQuestionService *service.QuizClosedQuestionService,
+	openQuestionService *openquestion.Service,
+	closedQuestionService *closedquestion.Service,
+) *API {
 	return &API{
-		QuizService: service,
+		quizService:               quizService,
+		sessionService:            sessionService,
+		quizOpenQuestionService:   quizOpenQuestionService,
+		quizClosedQuestionService: quizClosedQuestionService,
+		openQuestionService:       openQuestionService,
+		closedQuestionService:     closedQuestionService,
 	}
 }
 
@@ -28,28 +46,13 @@ type RowData struct {
 	Length    int
 }
 
-func extractUserAuth(c echo.Context) (*uint, error) {
-	sess, err := session.Get("quiz_app_session", c)
-	if err != nil {
-		return nil, err
-	}
-
-	id := sess.Values["id"]
-	if id == nil {
-		return nil, errors.New("user data not in session")
-	}
-
-	parsedId := id.(uint)
-	return &parsedId, nil
-}
-
 func (a *API) ListQuiz(c echo.Context) error {
-	userID, err := extractUserAuth(c)
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	quizs, err := a.QuizService.FindAll(*userID)
+	quizs, err := a.quizService.FindAll(*userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -76,18 +79,47 @@ func (a *API) FindQuiz(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	userID, err := extractUserAuth(c)
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	quiz, err := a.QuizService.FindById(uint(id), *userID)
+	quizOpenQuestions, err := a.quizOpenQuestionService.FindByQuizID(uint(id))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	quizClosedQuestions, err := a.quizClosedQuestionService.FindByQuizID(uint(id))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	quiz, err := a.quizService.FindById(uint(id), *userID)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	idsClosedQuestions := []uint{}
+	for _, question := range quizClosedQuestions {
+		idsClosedQuestions = append(idsClosedQuestions, question.ClosedQuestionID)
+	}
+	closedQuestions, err := a.closedQuestionService.FindAllByIds(idsClosedQuestions)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
+	idsOpenQuestions := []uint{}
+	for _, question := range quizOpenQuestions {
+		idsOpenQuestions = append(idsOpenQuestions, question.OpenQuestionID)
+	}
+	openQuestions, err := a.openQuestionService.FindAllByIds(idsOpenQuestions)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
 	data := map[string]interface{}{
-		"QuizTitle": quiz.Title,
+		"QuizTitle":       quiz.Title,
+		"OpenQuestions":   openQuestions,
+		"ClosedQuestions": closedQuestions,
 	}
 
 	return c.Render(http.StatusOK, "CardQuiz", data)
@@ -95,12 +127,12 @@ func (a *API) FindQuiz(c echo.Context) error {
 
 func (a *API) CreateQuiz(c echo.Context) error {
 	title := c.FormValue("QuizName")
-	userID, err := extractUserAuth(c)
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	quiz, err := a.QuizService.Create(title, *userID)
+	quiz, err := a.quizService.Create(title, *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -122,12 +154,12 @@ func (a *API) DeleteQuiz(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	userID, err := extractUserAuth(c)
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	err = a.QuizService.Delete(uint(id), *userID)
+	err = a.quizService.Delete(uint(id), *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -137,52 +169,73 @@ func (a *API) DeleteQuiz(c echo.Context) error {
 
 func (a *API) AddOpenQuestionQuiz(c echo.Context) error {
 	stringQuizId := c.QueryParam("quizID")
-	stringQuestioId := c.QueryParam("questionID")
+	stringQuestionId := c.QueryParam("questionID")
 
 	quizID, err := strconv.Atoi(stringQuizId)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
-	questionID, err := strconv.Atoi(stringQuestioId)
+	questionID, err := strconv.Atoi(stringQuestionId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	userID, err := extractUserAuth(c)
+	openQuestion, err := a.openQuestionService.FindById(uint(questionID))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	quiz, err := a.quizService.FindById(uint(quizID), *userID)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	question, err := a.quizOpenQuestionService.Create(*openQuestion, *quiz, 0)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	updatedQuiz, err := a.QuizService.AddOpenQuestion(uint(questionID), uint(quizID), uint(*userID))
-	if err != nil {
-		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	data := map[string]interface{}{
+		"Text": question.OpenQuestion.Text,
 	}
-
-	return c.Render(http.StatusOK, "CardQuiz", updatedQuiz)
+	return c.Render(http.StatusOK, "OpenQuestionSection", data)
 }
 
 func (a *API) AddClosedQuestionQuiz(c echo.Context) error {
 	stringQuizId := c.QueryParam("quizID")
-	stringQuestioId := c.QueryParam("questionID")
+	stringQuestionId := c.QueryParam("questionID")
 
 	quizID, err := strconv.Atoi(stringQuizId)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
-	questionID, err := strconv.Atoi(stringQuestioId)
+	questionID, err := strconv.Atoi(stringQuestionId)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	userID, err := a.sessionService.ExtractUserAuth(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	userID, err := extractUserAuth(c)
+	closedQuestion, err := a.closedQuestionService.FindById(uint(questionID))
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	quiz, err := a.quizService.FindById(uint(quizID), *userID)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+	question, err := a.quizClosedQuestionService.Create(*closedQuestion, *quiz, 0)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	updatedQuiz, err := a.QuizService.AddClosedQuestion(uint(questionID), uint(quizID), uint(*userID))
-	if err != nil {
-		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	data := map[string]interface{}{
+		"Text":    question.ClosedQuestion.Text,
+		"Answers": question.ClosedQuestion.Answers,
 	}
-
-	return c.Render(http.StatusOK, "CardQuiz", updatedQuiz)
+	return c.Render(http.StatusOK, "ClosedQuestionSection", data)
 }

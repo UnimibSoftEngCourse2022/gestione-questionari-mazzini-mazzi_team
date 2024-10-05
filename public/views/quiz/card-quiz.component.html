@@ -1,12 +1,22 @@
 {{ define "CardQuiz" }}
+<div id="card-quiz">
+  <div
+    href="#"
+    class="block p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 w-full"
+  >
+    <h3 class="font-normal text-gray-700 dark:text-gray-400">
+      {{ .QuizTitle }}
+    </h3>
 
-<div
-  href="#"
-  class="flex items-center block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
->
-  <p class="font-normal text-gray-700 dark:text-gray-400">
-    {{ .QuizTitle }}
-  </p>
+    <div id="quiz-question-section">
+      {{ range $index, $question := .OpenQuestions }}
+      {{ template "OpenQuestionSection" . }}
+      {{ end }}
+
+      {{ range $index, $question := .ClosedQuestions }}
+      {{ template "ClosedQuestionSection" . }}
+      {{ end }}
+    </div>
+  </div>
 </div>
-
 {{ end }}

@@ -49,13 +49,13 @@
     </button>
     <button
       {{ if eq .AnswerType "open-question" }}
-      hx-put="/quiz/update/add-open-question?id={{ .QuestionID }}"
+      hx-put="/quiz/update/add-open-question?questionID={{ .QuestionID }}&quizID=3"
       {{ else }}
-      hx-put="/quiz/update/add-closed-question?id={{ .QuestionID }}"
+      hx-put="/quiz/update/add-closed-question?questionID={{ .QuestionID }}&quizID=3"
       {{ end }}
       hx-trigger="click"
-      hx-target=""
-      hx-swap=""
+      hx-target="#quiz-question-section"
+      hx-swap="afterbegin"
       class="p-1 font-medium text-green-600 dark:text-green-500 "
     >
       add

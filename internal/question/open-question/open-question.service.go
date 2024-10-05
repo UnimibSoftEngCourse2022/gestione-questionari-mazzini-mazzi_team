@@ -29,6 +29,17 @@ func (a *Service) FindAll() ([]OpenQuestion, error) {
 	return questions, nil
 }
 
+func (a *Service) FindAllByIds(ids []uint) ([]OpenQuestion, error) {
+	questions, err := a.repository.FindAllByIds(ids)
+
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
+
+	return questions, nil
+}
+
 func (a *Service) FindById(id uint) (*OpenQuestion, error) {
 	partialQuestion := OpenQuestion{ID: id}
 	question, err := a.repository.Find(&partialQuestion)

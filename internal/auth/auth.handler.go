@@ -1,57 +1,26 @@
 package auth
 
 import (
+	session "form_management/common/session"
 	"form_management/internal/auth/user"
 	"net/http"
 
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
 type API struct {
-	userService *user.Service
+	userService    *user.Service
+	sessionService *session.SessionService
 }
 
-func NewAuthHandler(service *user.Service) *API {
+func NewAuthHandler(service *user.Service, sessionService *session.SessionService) *API {
 	return &API{
-		userService: service,
+		userService:    service,
+		sessionService: sessionService,
 	}
 }
 
 const ErrorPageHandler = "error.html"
-
-func updateSession(c echo.Context, id uint) error {
-	sess, err := session.Get("quiz_app_session", c)
-	if err != nil {
-		return err
-	}
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7,
-		HttpOnly: true,
-	}
-	sess.Values["id"] = id
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func deleteSession(c echo.Context) error {
-	sess, err := session.Get("quiz_app_session", c)
-	if err != nil {
-		return err
-	}
-
-	sess.Options.MaxAge = -1
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func (a *API) LoginGuest(c echo.Context) error {
 	code := c.FormValue("code")
@@ -60,7 +29,7 @@ func (a *API) LoginGuest(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	err = updateSession(c, user.ID)
+	err = a.sessionService.UpdateSession(c, user.ID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -76,7 +45,7 @@ func (a *API) LoginUser(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	err = updateSession(c, user.ID)
+	err = a.sessionService.UpdateSession(c, user.ID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -92,7 +61,7 @@ func (a *API) RegisterUser(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
-	err = updateSession(c, user.ID)
+	err = a.sessionService.UpdateSession(c, user.ID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
@@ -101,7 +70,7 @@ func (a *API) RegisterUser(c echo.Context) error {
 }
 
 func (a *API) Logout(c echo.Context) error {
-	err := deleteSession(c)
+	err := a.sessionService.DeleteSession(c)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}

@@ -30,9 +30,9 @@ func (a *SessionService) ExtractUserAuth(c echo.Context) (*uint, error) {
 		return nil, errors.New("user data not in session")
 	}
 
-	return id.(*uint), nil
+	parsedId := id.(uint)
+	return &parsedId, nil
 }
-
 func (a *SessionService) UpdateSession(c echo.Context, id uint) error {
 	sess, err := session.Get("quiz_app_session", c)
 	if err != nil {

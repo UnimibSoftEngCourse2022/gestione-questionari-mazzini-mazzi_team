@@ -20,12 +20,19 @@ func NewService(logger *common.MyLogger, db *gorm.DB) *Service {
 
 func (a *Service) FindAll() ([]ClosedQuestion, error) {
 	questions, err := a.repository.FindAll()
-
 	if err != nil {
 		a.logger.Error().Msg(err.Error())
 		return nil, err
 	}
+	return questions, nil
+}
 
+func (a *Service) FindAllByIds(ids []uint) ([]ClosedQuestion, error) {
+	questions, err := a.repository.FindAllByIds(ids)
+	if err != nil {
+		a.logger.Error().Msg(err.Error())
+		return nil, err
+	}
 	return questions, nil
 }
 

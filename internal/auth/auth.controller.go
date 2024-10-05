@@ -2,6 +2,7 @@ package auth
 
 import (
 	common "form_management/common/logger"
+	session "form_management/common/session"
 	"form_management/db"
 	"form_management/internal/auth/user"
 
@@ -15,7 +16,8 @@ func Route(e *echo.Group) {
 	db.AutoMigrate(&user.User{})
 
 	userService := user.NewService(&logger, db)
-	handler := NewAuthHandler(userService)
+	sessionService := session.NewService(&logger)
+	handler := NewAuthHandler(userService, sessionService)
 
 	e.POST("/login/user", handler.LoginUser)
 	e.POST("/login/guest", nil)

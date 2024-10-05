@@ -6,17 +6,17 @@ kanban-plugin: board
 
 ## TODO
 
-- [ ] questionari crud
-- [ ] GITHUB ACTION 
-	→ commit test and sonarquebe!!
-	→ push => BUILD!
+- [ ] question update
 - [ ] dto e validation
-- [ ] auth
+- [ ] sistemare frontend 
+	- usare pagine giuste
+	- individuare tutte le combinazioni
+- [ ] uoload file ??
 
 
 ## IN PROGRESS
 
-- [ ] template questionari
+- [ ] quiz update
 
 
 ## TESTING
@@ -26,6 +26,12 @@ kanban-plugin: board
 
 ## DONE
 
+- [ ] questionari crud
+- [ ] auth
+- [ ] template questionari
+- [ ] GITHUB ACTION 
+	→ commit test and sonarquebe!!
+	→ push => BUILD!
 - [ ] define all components
 - [ ] Create home templeate
 

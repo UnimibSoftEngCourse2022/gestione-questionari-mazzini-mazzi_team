@@ -26,8 +26,8 @@ func (r *QuizOpenQuestionRepository) FindAll(userID uint) ([]entities.QuizOpenQu
 	return questions, nil
 }
 
-func (r *QuizOpenQuestionRepository) Find(question *entities.QuizOpenQuestion) (*entities.QuizOpenQuestion, error) {
-	questions := &entities.QuizOpenQuestion{}
+func (r *QuizOpenQuestionRepository) Find(question *entities.QuizOpenQuestion) ([]entities.QuizOpenQuestion, error) {
+	questions := []entities.QuizOpenQuestion{}
 	if err := r.db.Where(question).Find(&questions).Error; err != nil {
 		return nil, err
 	}
@@ -42,16 +42,6 @@ func (r *QuizOpenQuestionRepository) Create(question *entities.QuizOpenQuestion)
 
 	return question, nil
 }
-
-// func (r *QuizOpenQuestionRepository) Update(updatedQuestion entities.QuizOpenQuestion) (*entities.QuizOpenQuestion, error) {
-// 	question := &entities.QuizOpenQuestion{}
-
-// 	if err := r.db.Model(question).Where("id = ?", updatedQuestion.ID).Updates(updatedQuestion).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return question, nil
-// }
 
 func (r *QuizOpenQuestionRepository) Delete(question *entities.QuizOpenQuestion) error {
 	if err := r.db.Delete(question).Error; err != nil {

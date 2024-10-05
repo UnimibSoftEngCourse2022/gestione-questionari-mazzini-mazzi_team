@@ -2,6 +2,7 @@ package services
 
 import (
 	common "form_management/common/logger"
+	openquestion "form_management/internal/question/open-question"
 	"form_management/internal/quiz/entities"
 	"form_management/internal/quiz/repositories"
 
@@ -20,7 +21,7 @@ func NewQuizOpenQuestionService(logger *common.MyLogger, db *gorm.DB) *QuizOpenQ
 	}
 }
 
-func (a *QuizOpenQuestionService) FindByQuizID(quizID uint) (*entities.QuizOpenQuestion, error) {
+func (a *QuizOpenQuestionService) FindByQuizID(quizID uint) ([]entities.QuizOpenQuestion, error) {
 	partialQuiz := entities.QuizOpenQuestion{QuizID: quizID}
 	quiz, err := a.repository.Find(&partialQuiz)
 
@@ -33,24 +34,24 @@ func (a *QuizOpenQuestionService) FindByQuizID(quizID uint) (*entities.QuizOpenQ
 }
 
 func (a *QuizOpenQuestionService) Create(
-	openQuestionID uint,
-	quizID uint,
+	openQuestion openquestion.OpenQuestion,
+	quiz entities.Quiz,
 	order int,
 ) (*entities.QuizOpenQuestion, error) {
 
-	quizClosedQuestion := &entities.QuizOpenQuestion{
-		OpenQuestionID: openQuestionID,
-		QuizID:         quizID,
-		Order:          order,
+	quizOpenQuestion := &entities.QuizOpenQuestion{
+		OpenQuestion: openQuestion,
+		Quiz:         quiz,
+		Order:        order,
 	}
-	quiz, err := a.repository.Create(quizClosedQuestion)
 
+	createdQuizOpenQuestion, err := a.repository.Create(quizOpenQuestion)
 	if err != nil {
 		a.logger.Error().Msg(err.Error())
 		return nil, err
 	}
 
-	return quiz, nil
+	return createdQuizOpenQuestion, nil
 }
 
 func (a *QuizOpenQuestionService) Delete(
