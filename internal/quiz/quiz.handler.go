@@ -84,16 +84,16 @@ func (a *API) FindQuiz(c echo.Context) error {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 
+	quiz, err := a.quizService.FindById(uint(id), *userID)
+	if err != nil {
+		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
+	}
+
 	quizOpenQuestions, err := a.quizOpenQuestionService.FindByQuizID(uint(id))
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}
 	quizClosedQuestions, err := a.quizClosedQuestionService.FindByQuizID(uint(id))
-	if err != nil {
-		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
-	}
-
-	quiz, err := a.quizService.FindById(uint(id), *userID)
 	if err != nil {
 		return c.Render(http.StatusNotFound, ErrorPageHandler, map[string]interface{}{"error": err.Error()})
 	}

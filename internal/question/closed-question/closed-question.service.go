@@ -28,6 +28,10 @@ func (a *Service) FindAll() ([]ClosedQuestion, error) {
 }
 
 func (a *Service) FindAllByIds(ids []uint) ([]ClosedQuestion, error) {
+	if len(ids) == 0 {
+		return []ClosedQuestion{}, nil
+	}
+
 	questions, err := a.repository.FindAllByIds(ids)
 	if err != nil {
 		a.logger.Error().Msg(err.Error())

@@ -18,7 +18,7 @@ func Route(e *echo.Group) {
 
 	closedQuestionService := closedquestion.NewService(&logger, db)
 	openQuestionService := openquestion.NewService(&logger, db)
-	handler := NewFormHanlder(closedQuestionService, openQuestionService)
+	handler := NewQuestionHanlder(closedQuestionService, openQuestionService)
 
 	e.GET("/findAll", handler.ListQuestions)
 	e.GET("/find", handler.FindQuestion)

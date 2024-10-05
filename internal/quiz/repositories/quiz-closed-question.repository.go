@@ -16,19 +16,9 @@ func NewQuizClosedQuestionRepository(db *gorm.DB) *QuizClosedQuestionRepository 
 	}
 }
 
-func (r *QuizClosedQuestionRepository) FindByIds(userID uint) ([]entities.QuizClosedQuestion, error) {
-	var questions []entities.QuizClosedQuestion
-
-	if err := r.db.Where("user_id = ? ", userID).Find(&questions).Error; err != nil {
-		return nil, err
-	}
-
-	return questions, nil
-}
-
-func (r *QuizClosedQuestionRepository) Find(question *entities.QuizClosedQuestion) ([]entities.QuizClosedQuestion, error) {
+func (r *QuizClosedQuestionRepository) FindByQuizId(quizID uint) ([]entities.QuizClosedQuestion, error) {
 	questions := []entities.QuizClosedQuestion{}
-	if err := r.db.Where(question).Find(&questions).Error; err != nil {
+	if err := r.db.Where("quiz_id = ?", quizID).Find(&questions).Error; err != nil {
 		return nil, err
 	}
 

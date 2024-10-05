@@ -1,0 +1,28 @@
+<body id="body" class="dark:bg-gray-900 antialiased">
+  <div>{{ template "NavBar" . }}</div>
+  <div class="max-w-screen-xl flex flex-wrap mx-auto p-8"></div>
+
+  <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <div
+      id="right-card"
+      class="py-4 pl-4 flex align-top col-span-2 bg-grey-500 text-white"
+    >
+      {{ template "DefaultCard" }}
+    </div>
+    <div
+      id="left-card"
+      class="py-4 pr-4 col-span-4 bg-grey-500 text-white"
+      hx-get="/form/findAll"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    >
+      {{ template "TableQuestions" }}
+    </div>
+  </div>
+</body>
+
+{{ define "DefaultCard"}}
+<div
+  class="p-4 rounded-lg w-full h-screen bg-gray-50 md:bg-white dark:bg-gray-800"
+></div>
+{{ end }}

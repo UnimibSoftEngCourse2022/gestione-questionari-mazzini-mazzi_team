@@ -22,8 +22,10 @@ func NewQuizClosedQuestionService(logger *common.MyLogger, db *gorm.DB) *QuizClo
 }
 
 func (a *QuizClosedQuestionService) FindByQuizID(quizID uint) ([]entities.QuizClosedQuestion, error) {
-	partialQuiz := entities.QuizClosedQuestion{QuizID: quizID}
-	quiz, err := a.repository.Find(&partialQuiz)
+	quiz, err := a.repository.FindByQuizId(quizID)
+	for _, q := range quiz {
+		a.logger.Info().Msgf("Found quizID: %d", q.ClosedQuestionID)
+	}
 
 	if err != nil {
 		a.logger.Error().Msg(err.Error())

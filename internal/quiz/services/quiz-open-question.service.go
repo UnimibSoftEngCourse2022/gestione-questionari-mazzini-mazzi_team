@@ -22,8 +22,10 @@ func NewQuizOpenQuestionService(logger *common.MyLogger, db *gorm.DB) *QuizOpenQ
 }
 
 func (a *QuizOpenQuestionService) FindByQuizID(quizID uint) ([]entities.QuizOpenQuestion, error) {
-	partialQuiz := entities.QuizOpenQuestion{QuizID: quizID}
-	quiz, err := a.repository.Find(&partialQuiz)
+	quiz, err := a.repository.FindByQuizID(quizID)
+	for _, q := range quiz {
+		a.logger.Info().Msgf("Found quizID: %d", q.OpenQuestionID)
+	}
 
 	if err != nil {
 		a.logger.Error().Msg(err.Error())

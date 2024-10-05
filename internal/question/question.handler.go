@@ -15,7 +15,7 @@ type API struct {
 	OpenQuestionService   *openquestion.Service
 }
 
-func NewFormHanlder(closedQuestionService *closedquestion.Service, openQuestionService *openquestion.Service) *API {
+func NewQuestionHanlder(closedQuestionService *closedquestion.Service, openQuestionService *openquestion.Service) *API {
 	return &API{
 		ClosedQuestionService: closedQuestionService,
 		OpenQuestionService:   openQuestionService,

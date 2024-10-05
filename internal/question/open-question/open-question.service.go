@@ -30,8 +30,11 @@ func (a *Service) FindAll() ([]OpenQuestion, error) {
 }
 
 func (a *Service) FindAllByIds(ids []uint) ([]OpenQuestion, error) {
-	questions, err := a.repository.FindAllByIds(ids)
+	if len(ids) == 0 {
+		return []OpenQuestion{}, nil
+	}
 
+	questions, err := a.repository.FindAllByIds(ids)
 	if err != nil {
 		a.logger.Error().Msg(err.Error())
 		return nil, err

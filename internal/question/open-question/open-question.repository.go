@@ -24,7 +24,7 @@ func (r *Repository) FindAll() ([]OpenQuestion, error) {
 
 func (r *Repository) FindAllByIds(ids []uint) ([]OpenQuestion, error) {
 	var questions []OpenQuestion
-	if err := r.db.Find(&questions, ids).Error; err != nil {
+	if err := r.db.Where(ids).Find(&questions).Error; err != nil {
 		return nil, err
 	}
 	return questions, nil

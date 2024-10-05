@@ -6,11 +6,15 @@ kanban-plugin: board
 
 ## TODO
 
+- [ ] find quiz
+- [ ] row button add !!
 - [ ] question update
+- [ ] fix closed_question answer!!
 - [ ] dto e validation
 - [ ] sistemare frontend 
 	- usare pagine giuste
 	- individuare tutte le combinazioni
+- [ ] errore handler
 - [ ] uoload file ??
 
 
