@@ -29,7 +29,6 @@ type PageData struct {
 	QuizId string
 }
 
-// TODO: replace with auth service
 type UserItem struct {
 	ItemText string
 	ItemURL  string

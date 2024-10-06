@@ -6,15 +6,15 @@ kanban-plugin: board
 
 ## TODO
 
+- [ ] dto e validation
+- [ ] errore handler
 - [ ] find quiz
 - [ ] row button add !!
 - [ ] question update
 - [ ] fix closed_question answer!!
-- [ ] dto e validation
 - [ ] sistemare frontend 
 	- usare pagine giuste
 	- individuare tutte le combinazioni
-- [ ] errore handler
 - [ ] uoload file ??
 
 
@@ -38,6 +38,17 @@ kanban-plugin: board
 	→ push => BUILD!
 - [ ] define all components
 - [ ] Create home templeate
+
+
+## TODO_RELAZIONE
+
+- [ ] *diagramma casi d'uso diviso in due / 3 a seconda delle iterazioni !!*
+- [ ] *diagramma di dominio x ogni iterazione => segui le divisioni di sopra*
+- [ ] SSD => create openquestion
+- [ ] Seq. Progettazione => create openquestion
+- [ ] diagramma a stati => openquestion
+- [ ] diagramma di attività => create openQuestion
+- [ ] Architettura software
 
 
 ## UML
@@ -88,6 +99,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,false,false,true,true,true,true,true,false],"tag-sort":[{"tag":"#progettazione"},{"tag":"#coding"}]}
+{"kanban-plugin":"board","list-collapse":[true,true,true,true,false,false,false,true,true,false],"tag-sort":[{"tag":"#progettazione"},{"tag":"#coding"}]}
 ```
 %%

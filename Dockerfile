@@ -19,4 +19,4 @@ COPY --from=dev /app/bin/api .
 RUN adduser -D -g '' appuser && chown -R appuser /app
 USER appuser
 
-CMD ["./bin/api"]
+CMD ["./api"]

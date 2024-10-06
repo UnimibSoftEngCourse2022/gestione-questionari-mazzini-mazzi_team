@@ -1,6 +1,9 @@
 .obsidian/
 .obsidian/*
 .obsidian/**
+bin/
+bin/*
+bin/**
 tmp/
 tmp/*
 tmp/**
