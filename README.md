@@ -30,7 +30,7 @@ cp .env.example .env
 3. Compilare e avviare i container con Docker Compose
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 4. Accedere all'applicazione
