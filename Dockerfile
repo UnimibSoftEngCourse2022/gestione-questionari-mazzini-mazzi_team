@@ -1,5 +1,4 @@
 FROM golang:1.22.6-alpine AS base
-FROM base AS dev
 
 RUN apk add --no-cache git bash
 
