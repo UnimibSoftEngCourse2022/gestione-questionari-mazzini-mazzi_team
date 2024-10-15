@@ -1,22 +1,15 @@
 FROM golang:1.22.6-alpine AS base
 FROM base AS dev
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git bash
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
 
 COPY . .
 
+RUN go mod download
+
+
 RUN go build -o ./bin/api ./cmd/main.go
 
-FROM alpine:latest AS prod
-
-WORKDIR /app
-COPY --from=dev /app/bin/api .
-
-RUN adduser -D -g '' appuser && chown -R appuser /app
-USER appuser
-
-CMD ["./api"]
+CMD ["./bin/api"]

@@ -1,7 +1,9 @@
 *.md
 **/dist
 .git/
-.env
+tmp/
+bin/
 .obsidian/
 project_analysis/
 instruction/
+sonar-project.properties
